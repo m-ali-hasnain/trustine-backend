@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+AUTH_USER_MODEL = 'api.User'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,6 +60,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
     ),
+    'EXCEPTION_HANDLER': 'api.utils.custom_exception_handler'
 }
 
 # Configure the JWT settings
