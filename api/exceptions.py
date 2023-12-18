@@ -11,6 +11,6 @@ class BaseCustomException(APIException):
         self.detail = detail
         self.status_code = code
     
-class WeakPasswordException(BaseCustomException):
+class NotFoundException(BaseCustomException):
     def __init__(self, detail):
-        super().__init__(detail, status.HTTP_400_BAD_REQUEST)
+        super().__init__(detail, status.HTTP_404_NOT_FOUND)

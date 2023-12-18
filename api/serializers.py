@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Course, CourseRegistration
 from .constants import ROLE_CHOICES, STUDENT
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -68,3 +68,23 @@ class UserLoginSerializer(serializers.Serializer):
             return validation
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid login credentials")
+    
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'role'
+        )
+      
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = "__all__"
+
+class CourseRegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseRegistration
+        fields = "__all__"

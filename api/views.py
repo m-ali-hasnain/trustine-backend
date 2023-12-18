@@ -1,8 +1,13 @@
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Course, CourseRegistration
+from .serializers import CourseRegistrationSerializer, CourseSerializer, UserSerializer
+from .permissions import IsAdminOrReadOnly, IsStudent
+from .exceptions import NotFoundException
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,    
@@ -56,3 +61,39 @@ class UserLoginView(APIView):
             }
 
             return Response(response, status=status_code)
+
+class UserView(APIView):
+    serializer_class = CourseSerializer
+    permission_classes = (IsAuthenticated, IsAdminOrReadOnly)
+
+    def get(self, request, pk=None):
+        try:
+            user = User.objects.get(pk=pk)
+            courses = Course.objects.filter(courseregistration__user=user).distinct()
+            serializer = CourseSerializer(courses, many=True, context={'request', request})
+            return Response(serializer.data)
+        except Exception as e:
+            raise NotFoundException('No such user found.')
+
+# Courses API
+class CourseViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, IsAdminOrReadOnly)
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    
+    @action(detail=True, methods=["get"])
+    def students(self, request, pk=None):
+        serializer = User
+        try:
+            course = Course.objects.get(pk=pk)
+            students =  User.objects.filter(courses__courseregistration__course_id=course.id).distinct()
+            serializer = UserSerializer(students, many=True, context={'request': request})
+            return Response(serializer.data)
+        except Exception as e:
+            raise NotFoundException('Course Not Found')
+
+
+class CourseRegistrationViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, IsStudent)
+    queryset = CourseRegistration.objects.all()
+    serializer_class = CourseRegistrationSerializer
