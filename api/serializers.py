@@ -7,10 +7,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ValidationError
 from .models import User
-
+from .constants import ROLE_CHOICES, STUDENT
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES, default=User.ADMIN)
+    role = serializers.ChoiceField(choices=ROLE_CHOICES, default=STUDENT)
     class Meta:
         model = User
         fields = (
@@ -35,7 +35,7 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, write_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
-    role = serializers.CharField(read_only=True)
+    role = serializers.IntegerField(read_only=True)
 
     def create(self, validated_date):
         pass
