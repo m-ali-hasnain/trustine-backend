@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ValidationError
-from .models import User
+from .models import User, Course, CourseRegistration
 from .constants import ROLE_CHOICES, STUDENT
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -31,12 +31,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return auth_user
 
 class UserLoginSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField()
     password = serializers.CharField(max_length=128, write_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
     role = serializers.IntegerField(read_only=True)
-
+    
     def create(self, validated_date):
         pass
 
@@ -57,14 +58,39 @@ class UserLoginSerializer(serializers.Serializer):
             access_token = str(refresh.access_token)
 
             update_last_login(None, user)
-
             validation = {
+                'id': user.id,
                 'access': access_token,
                 'refresh': refresh_token,
                 'email': user.email,
                 'role': user.role,
+                
             }
 
             return validation
         except User.DoesNotExist:
             raise serializers.ValidationError("Invalid login credentials")
+    
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'email',
+            'role'
+        )
+      
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = "__all__"
+
+class CourseRegistrationSerializer(serializers.ModelSerializer):
+    course_details = serializers.StringRelatedField(many=True)
+    class Meta:
+        # depth 2
+        model = CourseRegistration
+        fields = "__all__"
+    
