@@ -10,10 +10,11 @@ def custom_exception_handler(exc, context):
         errors = []
         for key in error_types:
             error_title = ""
+            print("Respone data: ", response.data[key])
             if type(response.data[key]) != list:
                 error_title = response.data[key].title()
             else:
-                if response.data[key][0].get('message'):
+                if type(response.data[key][0]) == dict and response.data[key][0].get('message'):
                     error_title = response.data[key][0].get('message').title()
                 else:
                     error_title = response.data[key][0].title()

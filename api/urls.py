@@ -17,8 +17,9 @@ router.register(r'registrations', CourseRegistrationViewSet)
 urlpatterns = [
     path('token/obtain', jwt_views.TokenObtainPairView.as_view(), name='token_create'),
     path('token/refresh', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('register', UserRegistrationView.as_view(), name='register'),
-    path('login', UserLoginView.as_view(), name='login'),
+    path('users/register', UserRegistrationView.as_view(), name='register'),
+    path('users/login', UserLoginView.as_view(), name='login'),
     path('users/<int:pk>/courses', UserView.as_view(), name='registered_courses' ),
+    path('users/<int:pk>/courses/<int:courseId>/', UserView.as_view(), name='remove_course'),
     path('', include(router.urls))
 ]
